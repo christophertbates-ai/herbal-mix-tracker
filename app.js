@@ -1,4 +1,6 @@
 const STORAGE_KEY = 'herbalTrackerData';
+let erectionChart = null;
+let alcoholChart = null;
 
 // Get today's date in local time as YYYY-MM-DD
 function getTodayLocal() {
@@ -66,7 +68,7 @@ function handleSubmit(event) {
       stoolForm: getFormValue('gut-stool'),
       regularity: getFormValue('gut-regularity')
     },
-       bp: {
+    bp: {
       dizziness: getFormValue('bp-dizzy'),
       exerciseTolerance: getFormValue('bp-exercise')
     },
@@ -74,6 +76,7 @@ function handleSubmit(event) {
       drinks: getFormValue('alcohol-drinks')
     },
     notes: document.getElementById('notes').value.trim()
+  };
 
   // Replace existing entry with same date, or push new
   const existingIndex = data.findIndex(d => d.date === date);
@@ -86,6 +89,7 @@ function handleSubmit(event) {
   saveData(data);
   renderEntries();
   renderSummary();
+  renderCharts();
   event.target.reset();
 
   // Reset date back to today (local) after clear
@@ -103,7 +107,7 @@ function renderEntries() {
 
   data.forEach(day => {
     const li = document.createElement('li');
-        li.className = 'entry-item';
+    li.className = 'entry-item';
     li.innerHTML = `
       <strong>${day.date}</strong><br>
       Dose: ${day.doseTbsp} Tbsp<br>
@@ -115,7 +119,6 @@ function renderEntries() {
       </span><br>
       <span class="small-text">${day.notes || ''}</span>
     `;
-
     list.appendChild(li);
   });
 }
@@ -142,6 +145,9 @@ function renderSummary() {
   const avgNightTrips = average(data.map(d => d.urinary.nightTrips));
   const avgEnergy = average(data.map(d => d.energy.energy));
   const avgDose = average(data.map(d => d.doseTbsp));
+  const avgDrinks = average(
+    data.map(d => (d.alcohol && typeof d.alcohol.drinks === 'number' ? d.alcohol.drinks : null))
+  );
 
   summaryDiv.innerHTML = `
     <p>Average dose (Tbsp): <strong>${avgDose ?? '-'}</strong></p>
@@ -149,7 +155,118 @@ function renderSummary() {
     <p>With stimulation (0–3): <strong>${avgStimulation ?? '-'}</strong></p>
     <p>Night trips (0–3, higher = better): <strong>${avgNightTrips ?? '-'}</strong></p>
     <p>Energy (0–3): <strong>${avgEnergy ?? '-'}</strong></p>
+    <p>Drinks per day (recent): <strong>${avgDrinks ?? '-'}</strong></p>
   `;
+}
+
+function renderCharts() {
+  const data = loadData().sort((a, b) => a.date.localeCompare(b.date));
+  const labels = data.map(d => d.date);
+  const morningScores = data.map(d =>
+    typeof d.erections.morning === 'number' ? d.erections.morning : null
+  );
+  const drinks = data.map(d =>
+    d.alcohol && typeof d.alcohol.drinks === 'number' ? d.alcohol.drinks : 0
+  );
+
+  const erectionCanvas = document.getElementById('erectionChart');
+  const alcoholCanvas = document.getElementById('alcoholChart');
+
+  if (!erectionCanvas || !alcoholCanvas || typeof Chart === 'undefined') {
+    return;
+  }
+
+  const ctx1 = erectionCanvas.getContext('2d');
+  const ctx2 = alcoholCanvas.getContext('2d');
+
+  // Destroy previous charts if they exist
+  if (erectionChart) erectionChart.destroy();
+  if (alcoholChart) alcoholChart.destroy();
+
+  // Chart 1: Morning erections over time
+  erectionChart = new Chart(ctx1, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: 'Morning erection (0–3)',
+          data: morningScores,
+          borderColor: '#0e7afe',
+          backgroundColor: 'rgba(14,122,254,0.2)',
+          tension: 0.3,
+          spanGaps: true
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: true }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          max: 3
+        }
+      }
+    }
+  });
+
+  // Chart 2: Alcohol vs morning erections
+  alcoholChart = new Chart(ctx2, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: 'Morning erection (0–3)',
+          data: morningScores,
+          borderColor: '#0e7afe',
+          backgroundColor: 'rgba(14,122,254,0.2)',
+          yAxisID: 'y1',
+          tension: 0.3,
+          spanGaps: true
+        },
+        {
+          label: 'Drinks',
+          data: drinks,
+          borderColor: '#ff9800',
+          backgroundColor: 'rgba(255,152,0,0.2)',
+          yAxisID: 'y2',
+          tension: 0.3
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: true }
+      },
+      scales: {
+        y1: {
+          type: 'linear',
+          position: 'left',
+          beginAtZero: true,
+          max: 3,
+          title: {
+            display: true,
+            text: 'Morning erection'
+          }
+        },
+        y2: {
+          type: 'linear',
+          position: 'right',
+          beginAtZero: true,
+          grid: { drawOnChartArea: false },
+          title: {
+            display: true,
+            text: 'Drinks'
+          }
+        }
+      }
+    }
+  });
 }
 
 window.addEventListener('load', () => {
@@ -168,4 +285,5 @@ window.addEventListener('load', () => {
 
   renderEntries();
   renderSummary();
+  renderCharts();
 });
