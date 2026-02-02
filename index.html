@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Herbal Mix Tracker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Herbal Mix Tracker</h1>
+  </header>
+
+  <main>
+    <section id="entry-section">
+      <h2>New Entry</h2>
+      <form id="entry-form">
+        <label>
+          Date
+          <input type="date" id="date" required>
+        </label>
+
+        <label>
+          Dose (Tbsp)
+          <input type="number" id="doseTbsp" step="0.25" min="0" required>
+        </label>
+
+        <h3>Erections (0–3)</h3>
+        <label>Morning
+          <input type="number" id="erections-morning" min="0" max="3">
+        </label>
+        <label>With stimulation
+          <input type="number" id="erections-stimulation" min="0" max="3">
+        </label>
+        <label>During sex/masturbation
+          <input type="number" id="erections-during" min="0" max="3">
+        </label>
+
+        <h3>Urinary (0–3)</h3>
+        <label>Night trips (3 = none)
+          <input type="number" id="urinary-night" min="0" max="3">
+        </label>
+        <label>Start ease
+          <input type="number" id="urinary-start" min="0" max="3">
+        </label>
+        <label>Stream strength
+          <input type="number" id="urinary-stream" min="0" max="3">
+        </label>
+        <label>Emptying
+          <input type="number" id="urinary-empty" min="0" max="3">
+        </label>
+
+        <h3>Energy & Mood (0–3)</h3>
+        <label>Energy
+          <input type="number" id="energy-energy" min="0" max="3">
+        </label>
+        <label>Focus
+          <input type="number" id="energy-focus" min="0" max="3">
+        </label>
+        <label>Motivation
+          <input type="number" id="energy-motivation" min="0" max="3">
+        </label>
+
+        <h3>Gut (0–3)</h3>
+        <label>Bloating (3 = none)
+          <input type="number" id="gut-bloating" min="0" max="3">
+        </label>
+        <label>Stool form
+          <input type="number" id="gut-stool" min="0" max="3">
+        </label>
+        <label>Regularity
+          <input type="number" id="gut-regularity" min="0" max="3">
+        </label>
+
+        <h3>BP / Dizziness (0–3)</h3>
+        <label>Lightheaded when standing (3 = never)
+          <input type="number" id="bp-dizzy" min="0" max="3">
+        </label>
+        <label>Exercise tolerance
+          <input type="number" id="bp-exercise" min="0" max="3">
+        </label>
+
+        <label>
+          Notes
+          <textarea id="notes" rows="3"></textarea>
+        </label>
+
+        <button type="submit">Save Entry</button>
+      </form>
+    </section>
+
+    <section id="summary-section">
+      <h2>Summary (Last 14 Days)</h2>
+      <div id="summary"></div>
+    </section>
+
+    <section id="entries-section">
+      <h2>Entries</h2>
+      <ul id="entries-list"></ul>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
