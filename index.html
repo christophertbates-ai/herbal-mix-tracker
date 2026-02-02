@@ -97,9 +97,18 @@
       </form>
     </section>
 
-    <section id="summary-section">
+     <section id="summary-section">
       <h2>Summary (Last 14 Days)</h2>
       <div id="summary"></div>
+    </section>
+
+    <section id="charts-section">
+      <h2>Trends</h2>
+      <h3>Morning Erections</h3>
+      <canvas id="erectionChart" height="200"></canvas>
+
+      <h3>Alcohol vs Morning Erections</h3>
+      <canvas id="alcoholChart" height="200"></canvas>
     </section>
 
     <section id="entries-section">
@@ -108,6 +117,9 @@
     </section>
   </main>
 
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
+
