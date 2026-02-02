@@ -1,4 +1,6 @@
 const STORAGE_KEY = 'herbalTrackerData';
+
+// Get today's date in local time as YYYY-MM-DD
 function getTodayLocal() {
   const d = new Date();
   const year = d.getFullYear();
@@ -84,10 +86,13 @@ function handleSubmit(event) {
   renderSummary();
   event.target.reset();
 
-  // Reset date back to today after clear
+  // Reset date back to today (local) after clear
   const today = getTodayLocal();
-  document.getElementById('date').value = today;
-
+  const dateInput = document.getElementById('date');
+  if (dateInput) {
+    dateInput.value = today;
+  }
+}
 
 function renderEntries() {
   const data = loadData().sort((a, b) => a.date.localeCompare(b.date));
@@ -150,13 +155,12 @@ window.addEventListener('load', () => {
     form.addEventListener('submit', handleSubmit);
   }
 
-   // Default date = today (local)
+  // Default date = today (local)
   const today = getTodayLocal();
   const dateInput = document.getElementById('date');
   if (dateInput) {
     dateInput.value = today;
   }
-
 
   renderEntries();
   renderSummary();
