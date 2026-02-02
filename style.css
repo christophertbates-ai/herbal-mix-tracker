@@ -64,3 +64,19 @@ section {
   font-size: 0.8rem;
   color: #aaa;
 }
+.scale-legend {
+  font-size: 0.9rem;
+  margin-bottom: 0.75rem;
+  color: #ccc;
+}
+
+input[type="number"] {
+  text-align: center;
+}
+
+/* Make 0–3 score fields stand out a bit */
+h3 + label input[type="number"],
+h3 + label + label input[type="number"] {
+  background: #111;
+  border-color: #777;
+}
