@@ -66,12 +66,14 @@ function handleSubmit(event) {
       stoolForm: getFormValue('gut-stool'),
       regularity: getFormValue('gut-regularity')
     },
-    bp: {
+       bp: {
       dizziness: getFormValue('bp-dizzy'),
       exerciseTolerance: getFormValue('bp-exercise')
     },
+    alcohol: {
+      drinks: getFormValue('alcohol-drinks')
+    },
     notes: document.getElementById('notes').value.trim()
-  };
 
   // Replace existing entry with same date, or push new
   const existingIndex = data.findIndex(d => d.date === date);
@@ -101,17 +103,19 @@ function renderEntries() {
 
   data.forEach(day => {
     const li = document.createElement('li');
-    li.className = 'entry-item';
+        li.className = 'entry-item';
     li.innerHTML = `
       <strong>${day.date}</strong><br>
       Dose: ${day.doseTbsp} Tbsp<br>
       <span class="small-text">
         Morning erection: ${day.erections.morning ?? '-'} |
         Night trips: ${day.urinary.nightTrips ?? '-'} |
-        Energy: ${day.energy.energy ?? '-'}
+        Energy: ${day.energy.energy ?? '-'} |
+        Drinks: ${day.alcohol?.drinks ?? 0}
       </span><br>
       <span class="small-text">${day.notes || ''}</span>
     `;
+
     list.appendChild(li);
   });
 }
