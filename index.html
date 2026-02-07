@@ -30,9 +30,13 @@
   <main>
     <section id="entry-section">
       <h2>New Entry</h2>
-            <p class="scale-legend">
-        Scoring: <strong>0</strong> = very poor, <strong>1</strong> = fair, <strong>2</strong> = good, <strong>3</strong> = great
-      </p>
+<p class="scale-legend">
+  You fill this in each morning, for <strong>yesterday / last night</strong>.
+  <br>
+  Use this scale for all scores:
+  <br>
+  <strong>0</strong> = very bad • <strong>1</strong> = bad • <strong>2</strong> = good • <strong>3</strong> = excellent
+</p>
 
       <form id="entry-form">
         <label>
@@ -56,10 +60,11 @@
           <input type="number" id="erections-during" min="0" max="3">
         </label>
 
-        <h3>Urinary (0–3)</h3>
-        <label>Night trips (3 = none)
-          <input type="number" id="urinary-night" min="0" max="3">
-        </label>
+<h3>Urinary last night (0–3, higher = better)</h3>
+<label>Night-time bathroom trips last night (3 = no trips, 0 = many trips)
+  <input type="number" id="urinary-night" min="0" max="3">
+</label>
+
         <label>Start ease
           <input type="number" id="urinary-start" min="0" max="3">
         </label>
@@ -99,10 +104,10 @@
         <label>Exercise tolerance
           <input type="number" id="bp-exercise" min="0" max="3">
         </label>
-        <h3>Alcohol</h3>
-        <label>Drinks today (number)
-          <input type="number" id="alcohol-drinks" min="0" step="1">
-        </label>
+<h3>Alcohol yesterday</h3>
+<label>Number of alcoholic drinks yesterday
+  <input type="number" id="alcohol-drinks" min="0" step="1">
+</label>
 
         <label>
           Notes
