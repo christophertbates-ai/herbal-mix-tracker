@@ -80,3 +80,101 @@ h3 + label + label input[type="number"] {
   background: #111;
   border-color: #777;
 }
+/* Authentication Styles */
+#auth-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
+}
+
+#auth-form-wrapper {
+  background: white;
+  padding: 40px;
+  border-radius: 10px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  max-width: 400px;
+  width: 100%;
+}
+
+#auth-form-wrapper h2 {
+  text-align: center;
+  color: #333;
+  margin-bottom: 30px;
+  font-size: 24px;
+}
+
+#auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+#auth-form input {
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 14px;
+  font-family: inherit;
+}
+
+#auth-form input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 5px rgba(102, 126, 234, 0.5);
+}
+
+#auth-form button,
+#signout-btn {
+  padding: 12px;
+  border: none;
+  border-radius: 5px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+#auth-form button:first-of-type {
+  background-color: #667eea;
+  color: white;
+}
+
+#auth-form button:first-of-type:hover {
+  background-color: #5568d3;
+}
+
+#auth-form button:last-of-type {
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+#auth-form button:last-of-type:hover {
+  background-color: #e0e0e0;
+}
+
+#signout-btn {
+  background-color: #ff6b6b;
+  color: white;
+  width: 100%;
+}
+
+#signout-btn:hover {
+  background-color: #ee5a52;
+}
+
+/* Main app container */
+#app-container header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  background-color: #f5f5f5;
+  border-bottom: 2px solid #ddd;
+}
+
+#app-container header h1 {
+  margin: 0;
+}

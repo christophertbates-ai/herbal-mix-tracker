@@ -5,8 +5,25 @@
   <title>Herbal Mix Tracker</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 </head>
 <body>
+    <!-- Authentication Section -->
+  <div id="auth-container">
+    <div id="auth-form-wrapper">
+      <h2>Login to Herbal Mix Tracker</h2>
+      <div id="auth-form">
+        <input type="email" id="auth-email" placeholder="Email" required>
+        <input type="password" id="auth-password" placeholder="Password" required>
+        <button onclick="handleSignIn()">Sign In</button>
+        <button onclick="handleSignUp()">Create Account</button>
+      </div>
+      <button onclick="handleSignOut()" id="signout-btn" style="display:none; margin-top: 10px;">Sign Out</button>
+    </div>
+  </div>
+
+  <!-- Main App (hidden until logged in) -->
+  <div id="app-container" style="display:none;">
   <header>
     <h1>Herbal Mix Tracker</h1>
   </header>
@@ -124,6 +141,7 @@
       <h2>Entries</h2>
       <ul id="entries-list"></ul>
     </section>
+      </div>
   </main>
 
   <!-- Chart.js CDN (UMD build for browser) -->

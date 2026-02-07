@@ -1,4 +1,7 @@
-const STORAGE_KEY = 'herbalTrackerData';
+// Supabase Configuration
+const SUPABASE_URL = 'https://rckxdgiwftapmpnwkuyt.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJja3hkZ2l3ZnRhcG1wbndrdXl0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0Nzc2MjYsImV4cCI6MjA4NjA1MzYyNn0.3oKCwwbvdf09rVNc1_D9kVxxan0UVtnZazoOFyaXnYk';
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // Chart instances
 let erectionChart = null;
@@ -17,18 +20,103 @@ function getTodayLocal() {
   return `${year}-${month}-${day}`;
 }
 
-function loadData() {
-  const raw = localStorage.getItem(STORAGE_KEY);
-  if (!raw) return [];
+async function loadData() {
   try {
-    return JSON.parse(raw);
-  } catch {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return [];
+    
+    const { data, error } = await supabase
+      .from('entries')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('date', { ascending: false });
+    
+    if (error) {
+      console.error('Load error:', error);
+      return [];
+    }
+    
+    // Convert database format to your app format
+    return data.map(entry => ({
+      date: entry.date,
+      doseTbsp: entry.dose_tbsp,
+      erections: {
+        morning: entry.erections_morning,
+        stimulation: entry.erections_stimulation,
+        duringSex: entry.erections_during_sex
+      },
+      urinary: {
+        nightTrips: entry.urinary_night_trips,
+        startEase: entry.urinary_start_ease,
+        streamStrength: entry.urinary_stream_strength,
+        emptying: entry.urinary_emptying
+      },
+      energy: {
+        energy: entry.energy_energy,
+        focus: entry.energy_focus,
+        motivation: entry.energy_motivation
+      },
+      gut: {
+        bloating: entry.gut_bloating,
+        stoolForm: entry.gut_stool_form,
+        regularity: entry.gut_regularity
+      },
+      bp: {
+        dizziness: entry.bp_dizziness,
+        exerciseTolerance: entry.bp_exercise_tolerance
+      },
+      alcohol: {
+        drinks: entry.alcohol_drinks
+      },
+      notes: entry.notes || ''
+    }));
+  } catch (error) {
+    console.error('Unexpected load error:', error);
     return [];
   }
 }
 
-function saveData(data) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+async function saveData(entry) {
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      alert('You must be logged in to save data');
+      return;
+    }
+    
+    const { error } = await supabase
+      .from('entries')
+      .upsert({
+        user_id: user.id,
+        date: entry.date,
+        dose_tbsp: entry.doseTbsp,
+        erections_morning: entry.erections.morning,
+        erections_stimulation: entry.erections.stimulation,
+        erections_during_sex: entry.erections.duringSex,
+        urinary_night_trips: entry.urinary.nightTrips,
+        urinary_start_ease: entry.urinary.startEase,
+        urinary_stream_strength: entry.urinary.streamStrength,
+        urinary_emptying: entry.urinary.emptying,
+        energy_energy: entry.energy.energy,
+        energy_focus: entry.energy.focus,
+        energy_motivation: entry.energy.motivation,
+        gut_bloating: entry.gut.bloating,
+        gut_stool_form: entry.gut.stoolForm,
+        gut_regularity: entry.gut.regularity,
+        bp_dizziness: entry.bp.dizziness,
+        bp_exercise_tolerance: entry.bp.exerciseTolerance,
+        alcohol_drinks: entry.alcohol.drinks,
+        notes: entry.notes
+      });
+    
+    if (error) {
+      console.error('Save error:', error);
+      alert('Error saving data: ' + error.message);
+    }
+  } catch (error) {
+    console.error('Unexpected save error:', error);
+    alert('Unexpected error saving data');
+  }
 }
 
 function getFormValue(id) {
@@ -93,9 +181,9 @@ function handleSubmit(event) {
   }
 
   saveData(data);
-  renderEntries();
-  renderSummary();
-  renderCharts();
+  await renderEntries();
+  await renderSummary();
+  await renderCharts();
   event.target.reset();
 
   // Reset date back to today (local) after clear
@@ -106,7 +194,7 @@ function handleSubmit(event) {
   }
 }
 
-function renderEntries() {
+async function renderEntries() {
   const data = loadData().sort((a, b) => a.date.localeCompare(b.date));
   const list = document.getElementById('entries-list');
   list.innerHTML = '';
@@ -135,7 +223,7 @@ function average(values) {
   return (nums.reduce((a, b) => a + b, 0) / nums.length).toFixed(2);
 }
 
-function renderSummary() {
+async function renderSummary() {
   const data = loadData()
     .sort((a, b) => b.date.localeCompare(a.date))
     .slice(0, 14); // last 14 entries
@@ -167,7 +255,7 @@ function renderSummary() {
   `;
 }
 
-function renderCharts() {
+async function renderCharts() {
   const data = loadData().sort((a, b) => a.date.localeCompare(b.date));
   const labels = data.map(d => d.date);
 
@@ -482,22 +570,115 @@ function renderCharts() {
     });
   }
 }
+// ===== AUTHENTICATION FUNCTIONS =====
 
-window.addEventListener('load', () => {
-  // Hook up form
-  const form = document.getElementById('entry-form');
-  if (form) {
-    form.addEventListener('submit', handleSubmit);
+async function handleSignUp() {
+  const email = document.getElementById('auth-email').value.trim();
+  const password = document.getElementById('auth-password').value;
+  
+  if (!email || !password) {
+    alert('Please enter email and password');
+    return;
   }
-
-  // Default date = today (local)
-  const today = getTodayLocal();
-  const dateInput = document.getElementById('date');
-  if (dateInput) {
-    dateInput.value = today;
+  
+  if (password.length < 6) {
+    alert('Password must be at least 6 characters');
+    return;
   }
+  
+  try {
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password
+    });
+    
+    if (error) {
+      alert('Sign up error: ' + error.message);
+      return;
+    }
+    
+    alert('Account created! Please check your email to confirm.');
+    document.getElementById('auth-email').value = '';
+    document.getElementById('auth-password').value = '';
+  } catch (error) {
+    alert('Unexpected error: ' + error.message);
+  }
+}
 
-  renderEntries();
-  renderSummary();
-  renderCharts();
+async function handleSignIn() {
+  const email = document.getElementById('auth-email').value.trim();
+  const password = document.getElementById('auth-password').value;
+  
+  if (!email || !password) {
+    alert('Please enter email and password');
+    return;
+  }
+  
+  try {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password
+    });
+    
+    if (error) {
+      alert('Sign in error: ' + error.message);
+      return;
+    }
+    
+    // Hide login, show app
+    showApp();
+  } catch (error) {
+    alert('Unexpected error: ' + error.message);
+  }
+}
+
+async function handleSignOut() {
+  try {
+    await supabase.auth.signOut();
+    // Show login, hide app
+    showLogin();
+  } catch (error) {
+    alert('Sign out error: ' + error.message);
+  }
+}
+
+function showLogin() {
+  document.getElementById('auth-container').style.display = 'flex';
+  document.getElementById('app-container').style.display = 'none';
+}
+
+function showApp() {
+  document.getElementById('auth-container').style.display = 'none';
+  document.getElementById('app-container').style.display = 'block';
+}
+
+window.addEventListener('load', async () => {
+  // Check if user is logged in
+  const { data: { user } } = await supabase.auth.getUser();
+  
+  if (!user) {
+    // User not logged in - show login form
+    showLogin();
+  } else {
+    // User is logged in - show app and load data
+    showApp();
+    
+    // Hook up form
+    const form = document.getElementById('entry-form');
+    if (form) {
+      form.addEventListener('submit', handleSubmit);
+    }
+
+    // Default date = today (local)
+    const today = getTodayLocal();
+    const dateInput = document.getElementById('date');
+    if (dateInput) {
+      dateInput.value = today;
+    }
+
+    // Load and display data
+    await renderEntries();
+    await renderSummary();
+    await renderCharts();
+  }
 });
