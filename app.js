@@ -171,18 +171,14 @@ async function handleSubmit(event) {
     notes: document.getElementById('notes').value.trim()
   };
 
-  // Save just this one day's entry to Supabase
   await saveData(day);
 
-  // Re-render everything from Supabase
   await renderEntries();
   await renderSummary();
   await renderCharts();
 
-  // Clear form
   event.target.reset();
 
-  // Reset date back to today (local)
   const today = getTodayLocal();
   const dateInput = document.getElementById('date');
   if (dateInput) {
@@ -191,7 +187,7 @@ async function handleSubmit(event) {
 }
 
 async function renderEntries() {
-  const data = loadData().sort((a, b) => a.date.localeCompare(b.date));
+const data = (await loadData()).sort((a, b) => a.date.localeCompare(b.date));
   const list = document.getElementById('entries-list');
   list.innerHTML = '';
 
@@ -220,7 +216,7 @@ function average(values) {
 }
 
 async function renderSummary() {
-  const data = loadData()
+  const data = (await loadData())
     .sort((a, b) => b.date.localeCompare(a.date))
     .slice(0, 14); // last 14 entries
 
@@ -252,7 +248,7 @@ async function renderSummary() {
 }
 
 async function renderCharts() {
-  const data = loadData().sort((a, b) => a.date.localeCompare(b.date));
+  const data = (await loadData()).sort((a, b) => a.date.localeCompare(b.date));
   const labels = data.map(d => d.date);
 
   const morningScores = data.map(d =>
@@ -621,8 +617,22 @@ async function handleSignIn() {
       return;
     }
     
-    // Hide login, show app
     showApp();
+
+    const form = document.getElementById('entry-form');
+    if (form) {
+      form.addEventListener('submit', handleSubmit);
+    }
+
+    const today = getTodayLocal();
+    const dateInput = document.getElementById('date');
+    if (dateInput) {
+      dateInput.value = today;
+    }
+
+    await renderEntries();
+    await renderSummary();
+    await renderCharts();
   } catch (error) {
     alert('Unexpected error: ' + error.message);
   }
@@ -649,32 +659,27 @@ function showApp() {
 }
 
 window.addEventListener('load', async () => {
-  // Check if user is logged in
   const { data: { user } } = await supabase.auth.getUser();
   
   if (!user) {
-    // User not logged in - show login form
     showLogin();
   } else {
-    // User is logged in - show app and load data
     showApp();
     
-    // Hook up form
     const form = document.getElementById('entry-form');
     if (form) {
       form.addEventListener('submit', handleSubmit);
     }
 
-    // Default date = today (local)
     const today = getTodayLocal();
     const dateInput = document.getElementById('date');
     if (dateInput) {
       dateInput.value = today;
     }
 
-    // Load and display data
     await renderEntries();
     await renderSummary();
     await renderCharts();
   }
 });
+
