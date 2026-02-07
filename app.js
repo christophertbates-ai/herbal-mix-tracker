@@ -126,9 +126,8 @@ function getFormValue(id) {
   return isNaN(num) ? null : num;
 }
 
-function handleSubmit(event) {
+async function handleSubmit(event) {
   event.preventDefault();
-  const data = loadData();
 
   const date = document.getElementById('date').value;
   const doseTbsp = getFormValue('doseTbsp');
@@ -172,21 +171,18 @@ function handleSubmit(event) {
     notes: document.getElementById('notes').value.trim()
   };
 
-  // Replace existing entry with same date, or push new
-  const existingIndex = data.findIndex(d => d.date === date);
-  if (existingIndex >= 0) {
-    data[existingIndex] = day;
-  } else {
-    data.push(day);
-  }
+  // Save just this one day's entry to Supabase
+  await saveData(day);
 
-  saveData(data);
+  // Re-render everything from Supabase
   await renderEntries();
   await renderSummary();
   await renderCharts();
+
+  // Clear form
   event.target.reset();
 
-  // Reset date back to today (local) after clear
+  // Reset date back to today (local)
   const today = getTodayLocal();
   const dateInput = document.getElementById('date');
   if (dateInput) {
