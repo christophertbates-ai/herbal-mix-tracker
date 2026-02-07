@@ -178,3 +178,35 @@ h3 + label + label input[type="number"] {
 #app-container header h1 {
   margin: 0;
 }
+
+/* Score picker buttons */
+.score-picker {
+  display: flex;
+  gap: 0.4rem;
+  margin-top: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.score-btn {
+  flex: 1 1 22%;
+  min-width: 70px;
+  padding: 0.35rem 0.5rem;
+  border-radius: 999px;
+  border: 1px solid #555;
+  background: #111;
+  color: #f5f5f5;
+  font-size: 0.8rem;
+  text-align: center;
+  cursor: pointer;
+}
+
+.score-btn.selected {
+  border-color: #0e7afe;
+  background: #0e7afe;
+  color: #fff;
+}
+
+.score-btn span.score-value {
+  font-weight: 600;
+  margin-right: 0.15rem;
+}
