@@ -1,7 +1,7 @@
 // Supabase Configuration
 const SUPABASE_URL = 'https://rckxdgiwftapmpnwkuyt.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJja3hkZ2l3ZnRhcG1wbndrdXl0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0Nzc2MjYsImV4cCI6MjA4NjA1MzYyNn0.3oKCwwbvdf09rVNc1_D9kVxxan0UVtnZazoOFyaXnYk';
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // Chart instances
 let erectionChart = null;
@@ -22,7 +22,7 @@ function getTodayLocal() {
 
 async function loadData() {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { user } } = await supabaseClient.auth.getUser();
     if (!user) return [];
     
     const { data, error } = await supabase
@@ -78,7 +78,7 @@ async function loadData() {
 
 async function saveData(entry) {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { user } } = await supabaseClient.auth.getUser();
     if (!user) {
       alert('You must be logged in to save data');
       return;
